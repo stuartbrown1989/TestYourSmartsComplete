@@ -29,7 +29,7 @@ import java.util.List;
 
 public class leaderboardChoiceActivity extends AppCompatActivity {
 
-    private List<leaderboardModel> catList;
+    private List<CategoryModel> catList;
     private GridView catView;
     private AppBarConfiguration mAppBarConfiguration;
     private BottomNavigationView bottomNavigationView;
@@ -95,7 +95,7 @@ public class leaderboardChoiceActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemReselectedListener);
         catView = findViewById(R.id.cat_Gridleaderboard);
         loadCategories();
-        leaderboardAdapter adapter = new leaderboardAdapter(catList);
+        CategoryAdapter adapter = new CategoryAdapter(catList);
         catView.setAdapter(adapter);
 
         catView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -106,19 +106,16 @@ public class leaderboardChoiceActivity extends AppCompatActivity {
                     Intent gkIntent = new Intent(leaderboardChoiceActivity.this, leaderboardgk_Quiz.class);
                     startActivity(gkIntent);
                 }
-
                 if(position == 1)
                 {
                     Intent pictureQIntent = new Intent(leaderboardChoiceActivity.this, leaderboardPictureQuiz.class);
                     startActivity(pictureQIntent);
                 }
-
                 if(position == 2)
                 {
                     Intent speedRunIntent = new Intent(leaderboardChoiceActivity.this, leaderboardSpeedrunQuiz.class);
                     startActivity(speedRunIntent);
                 }
-
                 if(position == 3)
                 {
                     Intent intentTopicQuiz = new Intent(leaderboardChoiceActivity.this, leaderboardTopicQuiz.class);
@@ -126,15 +123,14 @@ public class leaderboardChoiceActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     private void loadCategories()
     {
         catList = new ArrayList<>();
-        catList.add(new leaderboardModel("1", "General Knowledge Quiz"));
-        catList.add(new leaderboardModel("2", "Picture Quiz"));
-        catList.add(new leaderboardModel("3", "Speed Run Quiz"));
-        catList.add(new leaderboardModel("4", "Topic Quiz"));
+        catList.add(new CategoryModel("1", "General Knowledge Quiz"));
+        catList.add(new CategoryModel("2", "Picture Quiz"));
+        catList.add(new CategoryModel("3", "Speed Run Quiz"));
+        catList.add(new CategoryModel("4", "Topic Quiz"));
     }
 }

@@ -36,6 +36,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.protobuf.DoubleValue;
 import com.google.protobuf.NullValue;
 
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class speedRunQuizActivity extends AppCompatActivity {
     private Dialog loadingDialog;
     private String checkUser, userName;
     private int checkscore;
-    private int setTime = 61;
+    private int setTime = 15;
     private TimerTask timetoanswertask = null;
     private TextView SRDifficulty, headertime;
     private TextView textViewQuestion;
@@ -86,15 +87,18 @@ public class speedRunQuizActivity extends AppCompatActivity {
     private int score = 0;
 
     //UserStats Variables
-    private String gettime;
+
+    private String gettime, topicAverage, topicPercentage;
     private String guestLog = "Guest";
     private TextView timetoanswer, checkTimer;
     private double checkstoredaverage, calcNewAverage, calcNewTopicAverage;
-    private Double checkstoredTopicAverage;
+    private Double checkstoredTopicAverage, checkstoredPercentage, calcPercentage, calcTopicPercentgage, storeNewPercentage, checktopicPercentage, numberofQuestionsPercentage, calcNewPercentage;
     private int addtime = 0;
     private int tallytime = 0;
-
-    private double time;
+    private int calculatetime;
+    private double time, numberofCorrectAnswers, percentageofCorrectAnswers, numberofQuestions;
+    private String quizDifficulty;
+    private String actualTopic;
 
 
     private List<questionsModel> questionList;
@@ -408,7 +412,7 @@ public class speedRunQuizActivity extends AppCompatActivity {
         questionCount++;
         questionScoreCount++;
         testingQuestionCount++;
-
+        numberofQuestions++;
         answered = false;
         confirmNext.setText(confirm);
     }
@@ -427,6 +431,7 @@ public class speedRunQuizActivity extends AppCompatActivity {
                 score++;
                 potentialScore = questionScoreCount;
                 textViewScore.setText("Score: " + score + "/" + potentialScore);
+                numberofCorrectAnswers++;
             }
         }
 
@@ -435,6 +440,7 @@ public class speedRunQuizActivity extends AppCompatActivity {
                 score = score + 2;
                 potentialScore = questionScoreCount * 2;
                 textViewScore.setText("Score: " + score + "/" + potentialScore);
+                numberofCorrectAnswers++;
             }
         }
 
@@ -443,6 +449,7 @@ public class speedRunQuizActivity extends AppCompatActivity {
                 score = score + 3;
                 potentialScore = questionScoreCount * 3;
                 textViewScore.setText("Score: " + score + "/" + potentialScore);
+                numberofCorrectAnswers++;
             }
         }
         timetoanswerTimer.cancel();
@@ -669,8 +676,10 @@ public class speedRunQuizActivity extends AppCompatActivity {
     {
         Intent intent = getIntent();
         final String difficultSetting = intent.getStringExtra("Difficulty");
+        final String speedRunPercentageField = "Speed Run Correct Answer Percentage";
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         String userEmail = firebaseUser.getEmail();
+        numberofQuestions--;
         //Checking if document exists with the same name as the user Email
         DocumentReference statsRef;
 
@@ -686,6 +695,9 @@ public class speedRunQuizActivity extends AppCompatActivity {
                                 String userEmail = firebaseUser.getEmail();
                                 checkstoredaverage = snapshot.getDouble("Average Time");
                                 checkstoredTopicAverage = snapshot.getDouble("Speed Run Average");
+                                checkstoredPercentage = snapshot.getDouble("Correct Percentage");
+                                checktopicPercentage = snapshot.getDouble(speedRunPercentageField);
+                                calcPercentage = (numberofCorrectAnswers / numberofQuestions) * 100;
                                 //If there is no Topic Average stored, just add the time for this quiz only to a new field for the Selected Topic
                                 if(checkstoredTopicAverage == null)
                                 {
@@ -696,6 +708,27 @@ public class speedRunQuizActivity extends AppCompatActivity {
                                 {
                                     calcNewTopicAverage = (time + checkstoredTopicAverage) / 2;
                                     g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update("Speed Run Average", calcNewTopicAverage);
+                                }
+                                if(checkstoredPercentage == null)
+                                {
+                                    g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update("Correct Percentage", calcPercentage);
+                                }
+                                //If overall correct answer field does exist, do this
+                                if(checkstoredPercentage != null)
+                                {
+                                    calcNewPercentage = (calcPercentage + checkstoredPercentage) / 2;
+                                    g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update("Correct Percentage", calcNewPercentage);
+                                }
+                                //If topic percentage field does not exist, do this
+                                if(checktopicPercentage == null)
+                                {
+                                    g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update(speedRunPercentageField, calcPercentage);
+                                }
+                                //If topic percentage field does exist, do this
+                                if(checktopicPercentage != null)
+                                {
+                                    calcTopicPercentgage = (calcPercentage + checktopicPercentage) / 2;
+                                    g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update(speedRunPercentageField, calcTopicPercentgage);
                                 }
                                 //Always calculate the overall average  - This field will always be here if the snapshot exists, so no need for conditional null statement
                                 calcNewAverage = (time + checkstoredaverage) / 2;
@@ -714,8 +747,8 @@ public class speedRunQuizActivity extends AppCompatActivity {
                             }
                         }
                     });
-
     }
+
     private void countTimetoAnswerQuestions()
     {
         //Getting the time it takes to answer a question
@@ -735,7 +768,6 @@ public class speedRunQuizActivity extends AppCompatActivity {
     {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         String currentuserEmail = firebaseUser.getEmail();
-
         Task<QuerySnapshot> easyRef =
                 g_firestore.collection("USERS").
                         whereEqualTo("EMAIL_ID", currentuserEmail)
@@ -749,12 +781,9 @@ public class speedRunQuizActivity extends AppCompatActivity {
                                     }
                                 } else
                                     {
-
                                 }
                             }
                         });
     }
-
-
 }
 

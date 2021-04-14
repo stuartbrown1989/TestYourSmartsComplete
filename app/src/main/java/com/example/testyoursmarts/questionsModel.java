@@ -8,8 +8,7 @@ public class questionsModel
     private String option3;
     private String option4;
     private int correctAnswer;
-    private int ID;
-    private int Timer;
+
 
 
 

@@ -7,12 +7,6 @@ private String Difficulty, quiztype;
 private int score;
 
 
-
-    public userScoresModel ()
-    {
-
-    }
-
     public userScoresModel(String userName, String Difficulty, String quiztype,  int score) {
 
 

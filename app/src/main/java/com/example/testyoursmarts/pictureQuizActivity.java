@@ -91,15 +91,17 @@ public class pictureQuizActivity extends AppCompatActivity {
     private ArrayList<Integer> questionIDs = new ArrayList<Integer>();
 
     //UserStats Variables
-    private String gettime;
+    private String gettime, topicAverage, topicPercentage;
     private String guestLog = "Guest";
     private TextView timetoanswer, clickingImageText;
     private double checkstoredaverage, calcNewAverage, calcNewTopicAverage;
-    private Double checkstoredTopicAverage;
+    private Double checkstoredTopicAverage, checkstoredPercentage, calcPercentage, calcTopicPercentgage, storeNewPercentage, checktopicPercentage;
     private int addtime = 0;
     private int tallytime = 0;
     private int calculatetime;
-    private double time;
+    private double time, numberofCorrectAnswers, percentageofCorrectAnswers;
+    private String quizDifficulty;
+    private String actualTopic;
 
     private ConstraintLayout pictureQuizLayout;
     private TextView textViewQuestion;
@@ -383,6 +385,7 @@ public class pictureQuizActivity extends AppCompatActivity {
                 score++;
                 potentialScore = questionTotal;
                 textViewScore.setText("Score: " + score + "/" + potentialScore);
+                numberofCorrectAnswers++;
             }
         }
         if(difficultSetting.toString().equals("Medium")) {
@@ -390,6 +393,7 @@ public class pictureQuizActivity extends AppCompatActivity {
                 score = score + 2;
                 potentialScore = questionTotal * 2;
                 textViewScore.setText("Score: " + score + "/" + potentialScore);
+                numberofCorrectAnswers++;
             }
         }
         if(difficultSetting.toString().equals("Hard")) {
@@ -397,6 +401,7 @@ public class pictureQuizActivity extends AppCompatActivity {
                 score = score + 3;
                 potentialScore = questionTotal * 3;
                 textViewScore.setText("Score: " + score + "/" + potentialScore);
+                numberofCorrectAnswers++;
             }
         }
 
@@ -594,6 +599,7 @@ public class pictureQuizActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         final String difficultSetting = intent.getStringExtra("Difficulty");
+        final String pictureQuizField = "Picture Correct Answer Percentage";
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         String userEmail = firebaseUser.getEmail();
         //Checking if document exists with the same name as the user Email
@@ -611,6 +617,8 @@ public class pictureQuizActivity extends AppCompatActivity {
                                 String userEmail = firebaseUser.getEmail();
                                 checkstoredaverage = snapshot.getDouble("Average Time");
                                 checkstoredTopicAverage = snapshot.getDouble("Picture Average");
+                                checkstoredPercentage = snapshot.getDouble("Correct Percentage");
+                                checktopicPercentage = snapshot.getDouble(pictureQuizField);
                                 //If there is no Topic Average stored, just add the time for this quiz only to a new field for the Selected Topic
                                 if(checkstoredTopicAverage == null)
                                 {
@@ -621,6 +629,32 @@ public class pictureQuizActivity extends AppCompatActivity {
                                 {
                                     calcNewTopicAverage = (time + checkstoredTopicAverage) / 2;
                                     g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update("Picture Average", calcNewTopicAverage);
+                                }
+
+                                if(checkstoredPercentage == null)
+                                {
+                                    percentageofCorrectAnswers = numberofCorrectAnswers * 10;
+                                    g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update("Correct Percentage", percentageofCorrectAnswers);
+                                }
+                                //If overall correct answer field does exist, do this
+                                if(checkstoredPercentage != null)
+                                {
+                                    percentageofCorrectAnswers = numberofCorrectAnswers * 10;
+                                    calcPercentage = (percentageofCorrectAnswers + checkstoredPercentage) / 2;
+                                    g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update("Correct Percentage", calcPercentage);
+                                }
+                                //If topic percentage field does not exist, do this
+                                if(checktopicPercentage == null)
+                                {
+                                    percentageofCorrectAnswers = numberofCorrectAnswers * 10;
+                                    g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update(pictureQuizField, percentageofCorrectAnswers);
+                                }
+                                //If topic percentage field does exist, do this
+                                if(checktopicPercentage != null)
+                                {
+                                    percentageofCorrectAnswers = numberofCorrectAnswers * 10;
+                                    calcTopicPercentgage = (percentageofCorrectAnswers + checktopicPercentage) / 2;
+                                    g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update(pictureQuizField, calcTopicPercentgage);
                                 }
                                 //Always calculate the overall average  - This field will always be here if the snapshot exists, so no need for conditional null statement
                                 calcNewAverage = (time + checkstoredaverage) / 2;

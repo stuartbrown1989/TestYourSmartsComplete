@@ -33,11 +33,9 @@ public class dbQuery {
   public static int g_selected_cat_index = 0;
   public static List<questionsModel> g_question_list = new ArrayList<>();
   public static List<pictureQuizModel> pictureQ_List = new ArrayList<>();
-    private List <questionsModel> questionslist;
     public static List<userScoresModel> userScoreList = new ArrayList<>();
     public static List<statisticsModel> statisticTime = new ArrayList<>();
-  public static List<TestModel> g_testList = new ArrayList<>();
-  public static int g_selected_test_index = 0;
+
 
 
   public static void createUserData(String email, String name, final myCompleteListener completeListener)
@@ -99,68 +97,7 @@ public static void getUserScores(final myCompleteListener completeListenerQuesti
 
 }
 
-    public static void getUserTime(final myCompleteListener completeListenerQuestion)
-    {
-        g_firestore.collection("Questions")
 
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        //Get collection info and store it to the list
-                        for(DocumentSnapshot doc : queryDocumentSnapshots)
-                        {
-                            statisticTime .add(new statisticsModel(
-                                    doc.getLong("Average Time").doubleValue()
-
-                            ));
-                        }
-                        completeListenerQuestion.onSuccess();
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                        completeListenerQuestion.onFailure();
-                    }
-                });
-
-    }
-    public static void loadquestions(final myCompleteListener completeListenerQuestion)
-    {
-        g_firestore.collection("Questions")
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        //Get collection info and store it to the list
-                        for(DocumentSnapshot doc : queryDocumentSnapshots)
-                        {
-                            g_question_list.add(new questionsModel(
-                                    doc.getString("Question"),
-                                    doc.getString("Option_a"),
-                                    doc.getString("Option_b"),
-                                    doc.getString("Option_c"),
-                                    doc.getString("Option_d"),
-                                    doc.getLong("Answer").intValue()
-                            ));
-                        }
-                        completeListenerQuestion.onSuccess();
-                        Collections.shuffle(g_question_list);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                        completeListenerQuestion.onFailure();
-                    }
-                });
-
-    }
-//  .whereEqualTo("Category", g_catList.get(g_selected_cat_index).getDocID())
 
 
 }

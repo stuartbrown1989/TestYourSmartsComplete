@@ -81,7 +81,7 @@ public class topicSelector extends AppCompatActivity {
 
 
     private Toolbar toolbar;
-    private List <TestModel> testList;
+    private List <CategoryModel> topicList;
     private GridView testView;
     private TextView quizValue;
 
@@ -102,7 +102,7 @@ public class topicSelector extends AppCompatActivity {
 
         loadTestData();
         
-        testAdapter adapter = new testAdapter(testList);
+        CategoryAdapter adapter = new CategoryAdapter(topicList);
         testView.setAdapter(adapter);
 
         testView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -177,13 +177,13 @@ public class topicSelector extends AppCompatActivity {
 
     private void loadTestData()
     {
-        testList = new ArrayList<>();
-        testList.add(new TestModel("1","History"));
-        testList.add(new TestModel("2","Science"));
-        testList.add(new TestModel("3","Sports"));
-        testList.add(new TestModel("4","Film/TV"));
-        testList.add(new TestModel("5","Geography"));
-        testList.add(new TestModel("6","Music"));
+        topicList = new ArrayList<>();
+        topicList .add(new CategoryModel("1","History"));
+        topicList .add(new CategoryModel("2","Science"));
+        topicList .add(new CategoryModel("3","Sports"));
+        topicList .add(new CategoryModel("4","Film/TV"));
+        topicList .add(new CategoryModel("5","Geography"));
+        topicList .add(new CategoryModel("6","Music"));
     }
 
 

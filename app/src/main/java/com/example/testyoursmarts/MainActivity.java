@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 if(position == 2)
                 {
-                    String speedRunQuiz = "This is a speed Run Quiz - You will have 3 minutes to answer as many questions as you possibly can. You will not be  " +
+                    String speedRunQuiz = "This is a speed Run Quiz - You will have 1 minute to answer as many questions as you possibly can. You will not be  " +
                             "timed for each question and you will be given 4 potential answers";
                     String speedRunID = "Speed Run Quiz";
                     Intent speedRunIntent = new Intent(MainActivity.this, confirmQuiz.class);

@@ -93,7 +93,7 @@ public class leaderboardPictureQuiz extends AppCompatActivity {
         g_firestore = FirebaseFirestore.getInstance();
         userScoreList.clear();
         userScoreList.removeAll(Collections.emptyList());
-        getGKLeaderBoard();
+        getPictureLeaderBoard();
     }
     //Function to get all records and put them into an array list
     private void getAllRecords()
@@ -115,7 +115,7 @@ public class leaderboardPictureQuiz extends AppCompatActivity {
     }
 
     //Gets all records of this leaderboard on firestore - Also puts the order of the records that come out in descending order base on the score field(10, 9, 8 etc)
-    private void getGKLeaderBoard()
+    private void getPictureLeaderBoard()
     {
         Task<QuerySnapshot> easyRef =
                 g_firestore.collection("Leaderboards").document("Picture").collection("Scores")

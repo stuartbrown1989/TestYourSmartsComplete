@@ -64,17 +64,18 @@ public class topicQuizActivity extends AppCompatActivity {
     public static List<questionsModel> g_question_list = new ArrayList<>();
 
     //UserStats Variables
-    private String gettime, topicAverage;
+    private String gettime, topicAverage, topicPercentage;
     private String guestLog = "Guest";
     private TextView timetoanswer;
     private double checkstoredaverage, calcNewAverage, calcNewTopicAverage;
-    private Double checkstoredTopicAverage ;
+    private Double checkstoredTopicAverage, checkstoredPercentage, calcPercentage, calcTopicPercentgage, storeNewPercentage, checktopicPercentage;
     private int addtime = 0;
     private int tallytime = 0;
     private int calculatetime;
-    private double time;
+    private double time, numberofCorrectAnswers, percentageofCorrectAnswers;
     private String quizDifficulty;
     private String actualTopic;
+
 
     private Dialog loadingDialog;
     private ArrayList<Integer> questionIDs = new ArrayList<Integer>();
@@ -281,6 +282,8 @@ public class topicQuizActivity extends AppCompatActivity {
                 score++;
                 potentialScore = questionTotal;
                 textViewScore.setText("SCORE: " + score + "/" + potentialScore);
+                numberofCorrectAnswers++;
+
             }
         }
         if(difficultSetting.toString().equals("Medium")) {
@@ -288,6 +291,7 @@ public class topicQuizActivity extends AppCompatActivity {
                 score = score + 2;
                 potentialScore = questionTotal * 2;
                 textViewScore.setText("SCORE: " + score + "/" + potentialScore);
+                numberofCorrectAnswers++;
             }
         }
         if(difficultSetting.toString().equals("Hard")) {
@@ -295,6 +299,7 @@ public class topicQuizActivity extends AppCompatActivity {
                 score = score + 3;
                 potentialScore = questionTotal *3;
                 textViewScore.setText("SCORE: " + score + "/" + potentialScore);
+                numberofCorrectAnswers++;
             }
         }
         showSolution();
@@ -492,37 +497,13 @@ public class topicQuizActivity extends AppCompatActivity {
 //Setting the Average time taken to answer questions statistics based on difficulty/Topic
     private void setUserStatistics()
     {
+
         Intent intent = getIntent();
         final String difficultSetting = intent.getStringExtra("Difficulty");
         final String actualTopic = intent.getStringExtra("QuizTopic");
-        if(actualTopic.equals("GK"))
-        {
-            topicAverage = "GK Average";
-        }
-        if(actualTopic.equals("FilmTV"))
-        {
-            topicAverage = "FilmTV Average";
-        }
-        if(actualTopic.equals("Science"))
-        {
-            topicAverage = "Science Average";
-        }
-        if(actualTopic.equals("Geography"))
-        {
-            topicAverage = "Geography Average";
-        }
-        if(actualTopic.equals("History"))
-        {
-            topicAverage = "History Average";
-        }
-        if(actualTopic.equals("Music"))
-        {
-            topicAverage = "Music Average";
-        }
-        if(actualTopic.equals("Sports"))
-        {
-            topicAverage = "Sports Average";
-        }
+
+        topicAverage = actualTopic + " Average";
+       topicPercentage = actualTopic + " Correct Answer Percentage";
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         String userEmail = firebaseUser.getEmail();
         //Checking if document exists with the same name as the user Email
@@ -539,6 +520,8 @@ public class topicQuizActivity extends AppCompatActivity {
                                 String userEmail = firebaseUser.getEmail();
                                 checkstoredaverage = snapshot.getDouble("Average Time");
                                 checkstoredTopicAverage = snapshot.getDouble(topicAverage);
+                                checkstoredPercentage = snapshot.getDouble("Correct Percentage");
+                                checktopicPercentage = snapshot.getDouble(topicPercentage);
                                 //If there is no Topic Average stored, just add the time for this quiz only to a new field for the Selected Topic
                                 if(checkstoredTopicAverage == null)
                                 {
@@ -549,6 +532,32 @@ public class topicQuizActivity extends AppCompatActivity {
                                 {
                                     calcNewTopicAverage = (time + checkstoredTopicAverage) / 2;
                                     g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update(topicAverage, calcNewTopicAverage);
+                                }
+                                //If overall correct answer percentage field does not exist, do this
+                                if(checkstoredPercentage == null)
+                                {
+                                    percentageofCorrectAnswers = numberofCorrectAnswers * 10;
+                                    g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update("Correct Percentage", percentageofCorrectAnswers);
+                                }
+                                //If overall correct answer field does exist, do this
+                                if(checkstoredPercentage != null)
+                                {
+                                         percentageofCorrectAnswers = numberofCorrectAnswers * 10;
+                                        calcPercentage = (percentageofCorrectAnswers + checkstoredPercentage) / 2;
+                                        g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update("Correct Percentage", calcPercentage);
+                                }
+                                //If topic percentage field does not exist, do this
+                                if(checktopicPercentage == null)
+                                {
+                                    percentageofCorrectAnswers = numberofCorrectAnswers * 10;
+                                    g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update(topicPercentage, percentageofCorrectAnswers);
+                                }
+                                //If topic percentage field does exist, do this
+                                if(checktopicPercentage != null)
+                                {
+                                    percentageofCorrectAnswers = numberofCorrectAnswers * 10;
+                                    calcTopicPercentgage = (percentageofCorrectAnswers + checktopicPercentage) / 2;
+                                    g_firestore.collection("Statistics").document(difficultSetting).collection("Users").document(userEmail).update(topicPercentage, calcTopicPercentgage);
                                 }
                                 //Always calculate the overall average  - This field will always be here if the snapshot exists, so no need for conditional null statement
                                 calcNewAverage = (time + checkstoredaverage) / 2;
@@ -583,6 +592,8 @@ public class topicQuizActivity extends AppCompatActivity {
     {
         time = (float)tallytime / 10;
     }
+
+
 
     private void getUserName()
     {

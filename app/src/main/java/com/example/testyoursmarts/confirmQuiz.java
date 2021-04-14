@@ -336,14 +336,7 @@ public class confirmQuiz extends AppCompatActivity {
                     }
                     startActivity(musicQuizIntent);
                 }
-
             }
         });
-
-
-
-
     }
-
-
 }
